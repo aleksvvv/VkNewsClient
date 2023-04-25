@@ -17,22 +17,29 @@ import kotlinx.coroutines.launch
 fun MainScreen() {
     val snackbarHostState = SnackbarHostState()
     val scope = rememberCoroutineScope()
+    val floatingState = remember {
+        mutableStateOf(true)
+    }
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = "Hello World",
-                        actionLabel = "Close",
-                        duration = SnackbarDuration.Long
-                    )
+            if (floatingState.value) {
+                FloatingActionButton(onClick = {
+                    scope.launch {
+                        val action = snackbarHostState.showSnackbar(
+                            message = "Hello World",
+                            actionLabel = "Close",
+                            duration = SnackbarDuration.Long
+                        )
+                        if (action == SnackbarResult.ActionPerformed) {
+                            floatingState.value = false
+                        }
+                    }
+                }) {
+                    Icon(Icons.Default.Add, contentDescription = null)
                 }
-
-            }) {
-                Icon(Icons.Default.Add, contentDescription = null)
             }
         },
         bottomBar = {

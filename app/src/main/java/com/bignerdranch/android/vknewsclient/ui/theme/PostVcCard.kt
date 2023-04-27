@@ -53,15 +53,9 @@ fun PostVcCard(
             Spacer(modifier = Modifier.height(6.dp))
             StatisticPost(
                 statistics = feedPost.statPost,
-                onViewClickListener = {
-                    onViewClickListener(it)
-                },
-                onLikesClickListener ={
-                    onLikesClickListener(it)
-                },
-                onCommentsClickListener = {
-                    onCommentsClickListener(it)
-                },
+                onViewClickListener = onViewClickListener,
+                onLikesClickListener =onLikesClickListener,
+                onCommentsClickListener = onCommentsClickListener,
                 onSharesClickListener = {
                     onSharesClickListener(it)
                 }

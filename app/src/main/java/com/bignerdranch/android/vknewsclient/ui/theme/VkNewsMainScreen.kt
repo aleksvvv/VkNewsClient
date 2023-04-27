@@ -86,15 +86,9 @@ fun MainScreen(viewModel: MainViewModel) {
         PostVcCard(
             modifier = Modifier.padding(8.dp),
             feedPost = feedPost.value,
-            onViewClickListener = {
-                viewModel.updateCount(it)
-            },
-            onSharesClickListener = {
-                viewModel.updateCount(it)
-            },
-            onCommentsClickListener = {
-                viewModel.updateCount(it)
-            },
+            onViewClickListener = viewModel::updateCount,
+            onSharesClickListener = viewModel::updateCount,
+            onCommentsClickListener = viewModel::updateCount,
             onLikesClickListener = {
                 viewModel.updateCount(it)
             }

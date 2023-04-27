@@ -1,9 +1,11 @@
 package com.bignerdranch.android.vknewsclient.ui.theme
 
-import android.view.View.OnClickListener
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -17,8 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bignerdranch.android.vknewsclient.R
@@ -30,9 +30,12 @@ import com.bignerdranch.android.vknewsclient.domain.StatisticType
 fun PostVcCard(
     modifier: Modifier = Modifier,
     feedPost: FeedPost,
-    onStatisticsClickListener: (StatisticItem) -> Unit
+    onViewClickListener: (StatisticItem) -> Unit,
+    onCommentsClickListener: (StatisticItem) -> Unit,
+    onSharesClickListener: (StatisticItem) -> Unit,
+    onLikesClickListener: (StatisticItem) -> Unit
 ) {
-       Card(modifier = modifier) {
+    Card(modifier = modifier) {
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
@@ -50,8 +53,17 @@ fun PostVcCard(
             Spacer(modifier = Modifier.height(6.dp))
             StatisticPost(
                 statistics = feedPost.statPost,
-                onItemClickListener = {
-                    onStatisticsClickListener(it)
+                onViewClickListener = {
+                    onViewClickListener(it)
+                },
+                onLikesClickListener ={
+                    onLikesClickListener(it)
+                },
+                onCommentsClickListener = {
+                    onCommentsClickListener(it)
+                },
+                onSharesClickListener = {
+                    onSharesClickListener(it)
                 }
             )
         }
@@ -61,7 +73,10 @@ fun PostVcCard(
 @Composable
 fun StatisticPost(
     statistics: List<StatisticItem>,
-    onItemClickListener: (StatisticItem) -> Unit
+    onViewClickListener: (StatisticItem) -> Unit,
+    onCommentsClickListener: (StatisticItem) -> Unit,
+    onSharesClickListener: (StatisticItem) -> Unit,
+    onLikesClickListener: (StatisticItem) -> Unit
 ) {
     val feedPost = FeedPost()
     Row() {
@@ -73,9 +88,9 @@ fun StatisticPost(
                 text = viewItems.count.toString(),
                 painter = painterResource(id = R.drawable.ic_views_count),
                 onItemClickListener = {
-                    onItemClickListener(viewItems)
+                    onViewClickListener(viewItems)
                 }
-                            )
+            )
         }
         Row(
             modifier = Modifier.weight(1f),
@@ -86,7 +101,7 @@ fun StatisticPost(
                 text = commentsItems.count.toString(),
                 painter = painterResource(id = R.drawable.ic_share),
                 onItemClickListener = {
-                    onItemClickListener(commentsItems)
+                    onCommentsClickListener(commentsItems)
                 }
             )
             val sharesItems = statistics.getItemByType(StatisticType.SHARES)
@@ -94,7 +109,7 @@ fun StatisticPost(
                 text = sharesItems.count.toString(),
                 painter = painterResource(id = R.drawable.ic_comment),
                 onItemClickListener = {
-                    onItemClickListener(sharesItems)
+                    onSharesClickListener(sharesItems)
                 }
             )
             val likesItems = statistics.getItemByType(StatisticType.LIKES)
@@ -102,7 +117,7 @@ fun StatisticPost(
                 text = likesItems.count.toString(),
                 painter = painterResource(id = R.drawable.ic_like),
                 onItemClickListener = {
-                    onItemClickListener(likesItems)
+                    onLikesClickListener(likesItems)
                 }
             )
         }
@@ -120,7 +135,7 @@ private fun TwoElement(
     onItemClickListener: () -> Unit
 ) {
     Row(
-        modifier = Modifier.clickable { onItemClickListener()} ,
+        modifier = Modifier.clickable { onItemClickListener() },
         verticalAlignment = Alignment.CenterVertically
 
     ) {

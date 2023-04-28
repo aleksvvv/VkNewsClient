@@ -1,9 +1,8 @@
 package com.bignerdranch.android.vknewsclient.ui.theme
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
@@ -14,14 +13,16 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bignerdranch.android.vknewsclient.MainViewModel
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
@@ -107,10 +108,18 @@ fun MainScreen(viewModel: MainViewModel) {
                     viewModel.remove(feedPost)
                 }
                 SwipeToDismiss(
+                    modifier = Modifier.animateItemPlacement(),
                     state = stateDismiss,
                     directions = setOf(DismissDirection.EndToStart),
                     background = {
-                        Text(text = "Delete")
+                        Box(
+                            modifier = Modifier.padding(12.dp)
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.CenterEnd) {
+                            Text(text = "Delete Item",
+                                fontSize = 24.sp)
+                        }
+
                     }) {
                     PostVcCard(
                         feedPost = feedPost,

@@ -21,6 +21,7 @@ import com.bignerdranch.android.vknewsclient.MainViewModel
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
@@ -87,7 +88,7 @@ fun MainScreen(viewModel: MainViewModel) {
         val feedPosts =
             viewModel.feedPosts.observeAsState(listOf())
 
-        LazyColumn (
+        LazyColumn(
             contentPadding = PaddingValues(
                 top = 16.dp,
                 start = 8.dp,
@@ -95,25 +96,40 @@ fun MainScreen(viewModel: MainViewModel) {
                 bottom = 72.dp
             ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
-                ){
+        ) {
 
             items(
                 items = feedPosts.value,
-                key = {it.id}
-            ){feedPost->
-              PostVcCard(
-                  feedPost = feedPost,
-                  onViewClickListener = {statisticItem->
-                      viewModel.updateCount(feedPost, statisticItem) },
-                  onSharesClickListener = {statisticItem->
-                      viewModel.updateCount(feedPost, statisticItem) },
-                  onCommentsClickListener = {statisticItem->
-                      viewModel.updateCount(feedPost, statisticItem) },
-                  onLikesClickListener = {statisticItem->
-                      viewModel.updateCount(feedPost, statisticItem)
-                  }
-              )
-          }
+                key = { it.id }
+            ) { feedPost ->
+                val stateDismiss = rememberDismissState()
+                if (stateDismiss.isDismissed(DismissDirection.EndToStart)){
+                    viewModel.remove(feedPost)
+                }
+                SwipeToDismiss(
+                    state = stateDismiss,
+                    directions = setOf(DismissDirection.EndToStart),
+                    background = {
+                        Text(text = "Delete")
+                    }) {
+                    PostVcCard(
+                        feedPost = feedPost,
+                        onViewClickListener = { statisticItem ->
+                            viewModel.updateCount(feedPost, statisticItem)
+                        },
+                        onSharesClickListener = { statisticItem ->
+                            viewModel.updateCount(feedPost, statisticItem)
+                        },
+                        onCommentsClickListener = { statisticItem ->
+                            viewModel.updateCount(feedPost, statisticItem)
+                        },
+                        onLikesClickListener = { statisticItem ->
+                            viewModel.updateCount(feedPost, statisticItem)
+                        }
+                    )
+                }
+
+            }
         }
 
 

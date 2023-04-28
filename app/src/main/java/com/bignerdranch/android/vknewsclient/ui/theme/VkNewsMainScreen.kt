@@ -8,11 +8,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,7 +23,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-
+    val selectedNavItem by viewModel.selectedNavItem.observeAsState(NavigationItem.Home)
     val snackbarHostState = SnackbarHostState()
     val scope = rememberCoroutineScope()
     val floatingState = remember {
@@ -57,21 +54,17 @@ fun MainScreen(viewModel: MainViewModel) {
         },
         bottomBar = {
             BottomNavigation {
-                val selectedItemPosition = remember {
-                    mutableStateOf(0)
-                }
-
                 val items =
                     arrayOf(
                         NavigationItem.Home,
                         NavigationItem.Favorite,
                         NavigationItem.Profile
                     )
-                items.forEachIndexed { index, item ->
+                items.forEach{  item ->
                     BottomNavigationItem(
-                        selected = selectedItemPosition.value == index,
+                        selected = viewModel.selectedNavItem.value == item,
                         onClick = {
-                            selectedItemPosition.value = index
+                            viewModel.stateScreen(item)
                         },
                         label = {
                             Text(text = stringResource(id = item.titleResId))
@@ -86,60 +79,68 @@ fun MainScreen(viewModel: MainViewModel) {
             }
         }
     ) {
-        val feedPosts =
-            viewModel.feedPosts.observeAsState(listOf())
 
-        LazyColumn(
-            contentPadding = PaddingValues(
-                top = 16.dp,
-                start = 8.dp,
-                end = 8.dp,
-                bottom = 72.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-
-            items(
-                items = feedPosts.value,
-                key = { it.id }
-            ) { feedPost ->
-                val stateDismiss = rememberDismissState()
-                if (stateDismiss.isDismissed(DismissDirection.EndToStart)){
-                    viewModel.remove(feedPost)
-                }
-                SwipeToDismiss(
-                    modifier = Modifier.animateItemPlacement(),
-                    state = stateDismiss,
-                    directions = setOf(DismissDirection.EndToStart),
-                    background = {
-                        Box(
-                            modifier = Modifier.padding(12.dp)
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.CenterEnd) {
-                            Text(text = "Delete Item",
-                                fontSize = 24.sp)
-                        }
-
-                    }) {
-                    PostVcCard(
-                        feedPost = feedPost,
-                        onViewClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
-                        },
-                        onSharesClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
-                        },
-                        onCommentsClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
-                        },
-                        onLikesClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
-                        }
-                    )
-                }
-
-            }
+        when(selectedNavItem){
+            NavigationItem.Home-> HomeScreen(viewModel = viewModel)
+            NavigationItem.Profile->{
+                Text(text = "Profile")}
+            NavigationItem.Favorite->{Text(text = "Favorite")}
         }
+
+//        val feedPosts =
+//            viewModel.feedPosts.observeAsState(listOf())
+//
+//        LazyColumn(
+//            contentPadding = PaddingValues(
+//                top = 16.dp,
+//                start = 8.dp,
+//                end = 8.dp,
+//                bottom = 72.dp
+//            ),
+//            verticalArrangement = Arrangement.spacedBy(8.dp)
+//        ) {
+//
+//            items(
+//                items = feedPosts.value,
+//                key = { it.id }
+//            ) { feedPost ->
+//                val stateDismiss = rememberDismissState()
+//                if (stateDismiss.isDismissed(DismissDirection.EndToStart)){
+//                    viewModel.remove(feedPost)
+//                }
+//                SwipeToDismiss(
+//                    modifier = Modifier.animateItemPlacement(),
+//                    state = stateDismiss,
+//                    directions = setOf(DismissDirection.EndToStart),
+//                    background = {
+//                        Box(
+//                            modifier = Modifier.padding(12.dp)
+//                                .fillMaxSize(),
+//                            contentAlignment = Alignment.CenterEnd) {
+//                            Text(text = "Delete Item",
+//                                fontSize = 24.sp)
+//                        }
+//
+//                    }) {
+//                    PostVcCard(
+//                        feedPost = feedPost,
+//                        onViewClickListener = { statisticItem ->
+//                            viewModel.updateCount(feedPost, statisticItem)
+//                        },
+//                        onSharesClickListener = { statisticItem ->
+//                            viewModel.updateCount(feedPost, statisticItem)
+//                        },
+//                        onCommentsClickListener = { statisticItem ->
+//                            viewModel.updateCount(feedPost, statisticItem)
+//                        },
+//                        onLikesClickListener = { statisticItem ->
+//                            viewModel.updateCount(feedPost, statisticItem)
+//                        }
+//                    )
+//                }
+//
+//            }
+//        }
 
 
     }

@@ -37,7 +37,7 @@ fun PostVcCard(
 ) {
     Card(modifier = modifier) {
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
+//            modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
             PostHeader(feedPost)
             Text(text = feedPost.textPost)

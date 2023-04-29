@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.bignerdranch.android.vknewsclient.MainViewModel
 import com.bignerdranch.android.vknewsclient.navigation.AppNavGraph
+import com.bignerdranch.android.vknewsclient.navigation.Screen
 import kotlinx.coroutines.launch
 
 
@@ -64,11 +65,19 @@ fun MainScreen(viewModel: MainViewModel) {
                         NavigationItem.Favorite,
                         NavigationItem.Profile
                     )
-                items.forEach{  item ->
+                items.forEach { item ->
                     BottomNavigationItem(
                         selected = navBackStackEntry?.destination?.route == item.screen.route,
                         onClick = {
-                            navHostController.navigate(item.screen.route)
+                            navHostController.navigate(item.screen.route) {
+                                popUpTo(
+                                   Screen.NewsFeed.route
+                                ){
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         },
                         label = {
                             Text(text = stringResource(id = item.titleResId))
@@ -87,9 +96,9 @@ fun MainScreen(viewModel: MainViewModel) {
         AppNavGraph(
             navHostController = navHostController,
             homeScreenContent = { HomeScreen(viewModel = viewModel) },
-            favoriteScreenContent = { Text(text = "Favorite")},
-            profileScreenContent = { Text(text = "Profile")}
-            )
+            favoriteScreenContent = { Text(text = "Favorite") },
+            profileScreenContent = { Text(text = "Profile") }
+        )
 
 //        when(selectedNavItem){
 //            NavigationItem.Home-> HomeScreen(viewModel = viewModel)

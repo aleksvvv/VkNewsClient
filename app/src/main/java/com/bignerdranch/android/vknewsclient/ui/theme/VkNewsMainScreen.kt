@@ -15,7 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.bignerdranch.android.vknewsclient.MainViewModel
+import com.bignerdranch.android.vknewsclient.navigation.AppNavGraph
 import kotlinx.coroutines.launch
 
 
@@ -29,6 +31,7 @@ fun MainScreen(viewModel: MainViewModel) {
     val floatingState = remember {
         mutableStateOf(true)
     }
+    val navHostController = rememberNavController()
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
@@ -54,6 +57,7 @@ fun MainScreen(viewModel: MainViewModel) {
         },
         bottomBar = {
             BottomNavigation {
+                val navBackStackEntry = navHostController.currentBackStackEntry
                 val items =
                     arrayOf(
                         NavigationItem.Home,
@@ -62,9 +66,9 @@ fun MainScreen(viewModel: MainViewModel) {
                     )
                 items.forEach{  item ->
                     BottomNavigationItem(
-                        selected = viewModel.selectedNavItem.value == item,
+                        selected = navBackStackEntry?.destination?.route == item.screen.route,
                         onClick = {
-                            viewModel.stateScreen(item)
+                            navHostController.navigate(item.screen.route)
                         },
                         label = {
                             Text(text = stringResource(id = item.titleResId))
@@ -80,68 +84,19 @@ fun MainScreen(viewModel: MainViewModel) {
         }
     ) {
 
-        when(selectedNavItem){
-            NavigationItem.Home-> HomeScreen(viewModel = viewModel)
-            NavigationItem.Profile->{
-                Text(text = "Profile")}
-            NavigationItem.Favorite->{Text(text = "Favorite")}
-        }
+        AppNavGraph(
+            navHostController = navHostController,
+            homeScreenContent = { HomeScreen(viewModel = viewModel) },
+            favoriteScreenContent = { Text(text = "Favorite")},
+            profileScreenContent = { Text(text = "Profile")}
+            )
 
-//        val feedPosts =
-//            viewModel.feedPosts.observeAsState(listOf())
-//
-//        LazyColumn(
-//            contentPadding = PaddingValues(
-//                top = 16.dp,
-//                start = 8.dp,
-//                end = 8.dp,
-//                bottom = 72.dp
-//            ),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
-//        ) {
-//
-//            items(
-//                items = feedPosts.value,
-//                key = { it.id }
-//            ) { feedPost ->
-//                val stateDismiss = rememberDismissState()
-//                if (stateDismiss.isDismissed(DismissDirection.EndToStart)){
-//                    viewModel.remove(feedPost)
-//                }
-//                SwipeToDismiss(
-//                    modifier = Modifier.animateItemPlacement(),
-//                    state = stateDismiss,
-//                    directions = setOf(DismissDirection.EndToStart),
-//                    background = {
-//                        Box(
-//                            modifier = Modifier.padding(12.dp)
-//                                .fillMaxSize(),
-//                            contentAlignment = Alignment.CenterEnd) {
-//                            Text(text = "Delete Item",
-//                                fontSize = 24.sp)
-//                        }
-//
-//                    }) {
-//                    PostVcCard(
-//                        feedPost = feedPost,
-//                        onViewClickListener = { statisticItem ->
-//                            viewModel.updateCount(feedPost, statisticItem)
-//                        },
-//                        onSharesClickListener = { statisticItem ->
-//                            viewModel.updateCount(feedPost, statisticItem)
-//                        },
-//                        onCommentsClickListener = { statisticItem ->
-//                            viewModel.updateCount(feedPost, statisticItem)
-//                        },
-//                        onLikesClickListener = { statisticItem ->
-//                            viewModel.updateCount(feedPost, statisticItem)
-//                        }
-//                    )
-//                }
-//
-//            }
+//        when(selectedNavItem){
+//            NavigationItem.Home-> HomeScreen(viewModel = viewModel)
+//            NavigationItem.Profile->{
+//                Text(text = "Profile")}
+//            NavigationItem.Favorite->{Text(text = "Favorite")}
 //        }
-
 
     }
 }

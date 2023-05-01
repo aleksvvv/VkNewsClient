@@ -18,7 +18,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.bignerdranch.android.vknewsclient.MainViewModel
 import com.bignerdranch.android.vknewsclient.navigation.AppNavGraph
+import com.bignerdranch.android.vknewsclient.navigation.NavigationState
 import com.bignerdranch.android.vknewsclient.navigation.Screen
+import com.bignerdranch.android.vknewsclient.navigation.rememberNavigateState
 import kotlinx.coroutines.launch
 
 
@@ -32,7 +34,9 @@ fun MainScreen(viewModel: MainViewModel) {
     val floatingState = remember {
         mutableStateOf(true)
     }
-    val navHostController = rememberNavController()
+
+    val navigationState = rememberNavigateState()
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
@@ -58,7 +62,7 @@ fun MainScreen(viewModel: MainViewModel) {
         },
         bottomBar = {
             BottomNavigation {
-                val navBackStackEntry = navHostController.currentBackStackEntry
+                val navBackStackEntry = navigationState.navHostController.currentBackStackEntry
                 val items =
                     arrayOf(
                         NavigationItem.Home,
@@ -69,15 +73,16 @@ fun MainScreen(viewModel: MainViewModel) {
                     BottomNavigationItem(
                         selected = navBackStackEntry?.destination?.route == item.screen.route,
                         onClick = {
-                            navHostController.navigate(item.screen.route) {
-                                popUpTo(
-                                   Screen.NewsFeed.route
-                                ){
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                                  navigationState.navigateTo(item.screen.route)
+//                            navHostController.navigate(item.screen.route) {
+//                                popUpTo(
+//                                   Screen.NewsFeed.route
+//                                ){
+//                                    saveState = true
+//                                }
+//                                launchSingleTop = true
+//                                restoreState = true
+//                            }
                         },
                         label = {
                             Text(text = stringResource(id = item.titleResId))
@@ -94,7 +99,7 @@ fun MainScreen(viewModel: MainViewModel) {
     ) {
 
         AppNavGraph(
-            navHostController = navHostController,
+            navHostController = navigationState.navHostController,
             homeScreenContent = { HomeScreen(viewModel = viewModel) },
             favoriteScreenContent = { Text(text = "Favorite") },
             profileScreenContent = { Text(text = "Profile") }

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bignerdranch.android.vknewsclient.domain.FeedPost
 import com.bignerdranch.android.vknewsclient.domain.StatisticItem
+import com.bignerdranch.android.vknewsclient.ui.theme.HomeScreenState
 import com.bignerdranch.android.vknewsclient.ui.theme.NavigationItem
 
 class MainViewModel : ViewModel() {
@@ -14,9 +15,10 @@ class MainViewModel : ViewModel() {
             add(FeedPost(id = it))
         }
     }
+    val initialState = HomeScreenState.Posts(initFeed)
 
-    private val _feedPosts = MutableLiveData<List<FeedPost>>(initFeed)
-    val feedPosts: LiveData<List<FeedPost>> = _feedPosts
+    private val _screenState = MutableLiveData<HomeScreenState>(initialState)
+    val screenState: LiveData<HomeScreenState> = _screenState
 
     private val _selectedNavItem = MutableLiveData<NavigationItem>(NavigationItem.Home)
     val selectedNavItem: LiveData<NavigationItem> = _selectedNavItem
@@ -25,7 +27,7 @@ class MainViewModel : ViewModel() {
         _selectedNavItem.value = item
     }
     fun updateCount(feedPost: FeedPost, item: StatisticItem) {
-        val oldPosts = feedPosts.value?.toMutableList() ?: mutableListOf()
+        val oldPosts = screenState.value?.toMutableList() ?: mutableListOf()
 
         val oldStatistics = feedPost.statPost
 
@@ -40,7 +42,7 @@ class MainViewModel : ViewModel() {
                 }
             }
         val newFeedPost = feedPost.copy(statPost = newStatistics)
-        _feedPosts.value = oldPosts.toMutableList().apply {
+        _screenState.value = oldPosts.toMutableList().apply {
             replaceAll {
                 if (newFeedPost.id == it.id) {
                     newFeedPost
@@ -51,9 +53,9 @@ class MainViewModel : ViewModel() {
         }
     }
     fun remove(feedPost: FeedPost){
-        val oldPosts = feedPosts.value?.toMutableList() ?: mutableListOf()
+        val oldPosts = screenState.value?.toMutableList() ?: mutableListOf()
         oldPosts.remove(feedPost)
-        _feedPosts.value = oldPosts
+        _screenState.value = oldPosts
     }
 
 }

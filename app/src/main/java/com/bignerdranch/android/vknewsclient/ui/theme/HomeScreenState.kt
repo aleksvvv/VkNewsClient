@@ -11,5 +11,6 @@ sealed class HomeScreenState{
 
     data class Comments(
         val feedPost:FeedPost,
-        val comments: List<PostComment>):HomeScreenState()
+        val comments: List<PostComment>
+        ):HomeScreenState()
 }

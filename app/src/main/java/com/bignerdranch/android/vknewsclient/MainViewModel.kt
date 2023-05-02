@@ -1,15 +1,21 @@
 package com.bignerdranch.android.vknewsclient
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bignerdranch.android.vknewsclient.domain.FeedPost
+import com.bignerdranch.android.vknewsclient.domain.PostComment
 import com.bignerdranch.android.vknewsclient.domain.StatisticItem
 import com.bignerdranch.android.vknewsclient.ui.theme.HomeScreenState
 import com.bignerdranch.android.vknewsclient.ui.theme.NavigationItem
 
 class MainViewModel : ViewModel() {
+
+    val comments = mutableListOf<PostComment>().apply {
+        repeat(10) {
+            add(PostComment(id = it))
+        }
+    }
     val initFeed = mutableListOf<FeedPost>().apply {
         repeat(10) {
             add(FeedPost(id = it))
@@ -23,11 +29,15 @@ class MainViewModel : ViewModel() {
     private val _selectedNavItem = MutableLiveData<NavigationItem>(NavigationItem.Home)
     val selectedNavItem: LiveData<NavigationItem> = _selectedNavItem
 
-    fun stateScreen(item: NavigationItem){
+    fun stateScreen(item: NavigationItem) {
         _selectedNavItem.value = item
     }
+
     fun updateCount(feedPost: FeedPost, item: StatisticItem) {
-        val oldPosts = screenState.value?.toMutableList() ?: mutableListOf()
+        val currentState = screenState.value
+        if (currentState !is HomeScreenState.Posts) return
+
+        val oldPosts = currentState.posts.toMutableList()
 
         val oldStatistics = feedPost.statPost
 
@@ -42,7 +52,7 @@ class MainViewModel : ViewModel() {
                 }
             }
         val newFeedPost = feedPost.copy(statPost = newStatistics)
-        _screenState.value = oldPosts.toMutableList().apply {
+        val newPosts = oldPosts.toMutableList().apply {
             replaceAll {
                 if (newFeedPost.id == it.id) {
                     newFeedPost
@@ -51,11 +61,26 @@ class MainViewModel : ViewModel() {
                 }
             }
         }
+        _screenState.value = HomeScreenState.Posts(posts = newPosts)
     }
-    fun remove(feedPost: FeedPost){
-        val oldPosts = screenState.value?.toMutableList() ?: mutableListOf()
+
+    private var savedState: HomeScreenState? = initialState
+    fun showComments(feedPost: FeedPost) {
+        savedState = _screenState.value
+        _screenState.value = HomeScreenState.Comments(feedPost, comments)
+    }
+
+    fun closeComments() {
+        _screenState.value = savedState
+    }
+
+    fun remove(feedPost: FeedPost) {
+        val currentState = screenState.value
+        if (currentState !is HomeScreenState.Posts) return
+
+        val oldPosts = currentState.posts.toMutableList()
         oldPosts.remove(feedPost)
-        _screenState.value = oldPosts
+        _screenState.value = HomeScreenState.Posts(posts = oldPosts)
     }
 
 }

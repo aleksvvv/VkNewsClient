@@ -1,5 +1,6 @@
 package com.bignerdranch.android.vknewsclient.ui.theme
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,8 +35,14 @@ fun HomeScreen(
         is HomeScreenState.Comments -> {
             CommentsScreen(
                 feedPost = currentState.feedPost,
-                comments = currentState.comments
+                comments = currentState.comments,
+                onBackPressed = {
+                    viewModel.closeComments()
+                }
             )
+            BackHandler() {
+                viewModel.closeComments()
+            }
         }
 
         is HomeScreenState.Initial -> {}
@@ -99,8 +106,8 @@ fun FeedPosts(
                     onSharesClickListener = { statisticItem ->
                         viewModel.updateCount(feedPost, statisticItem)
                     },
-                    onCommentsClickListener = { statisticItem ->
-                        viewModel.updateCount(feedPost, statisticItem)
+                    onCommentsClickListener = {
+                        viewModel.showComments(feedPost = feedPost)
                     },
                     onLikesClickListener = { statisticItem ->
                         viewModel.updateCount(feedPost, statisticItem)

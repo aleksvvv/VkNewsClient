@@ -68,8 +68,8 @@ fun PostVcCard(
 fun StatisticPost(
     statistics: List<StatisticItem>,
     onViewClickListener: (StatisticItem) -> Unit,
-    onCommentsClickListener: (StatisticItem) -> Unit,
     onSharesClickListener: (StatisticItem) -> Unit,
+    onCommentsClickListener: (StatisticItem) -> Unit,
     onLikesClickListener: (StatisticItem) -> Unit
 ) {
     val feedPost = FeedPost()
@@ -90,22 +90,23 @@ fun StatisticPost(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            val commentsItems = statistics.getItemByType(StatisticType.COMMENTS)
-            TwoElement(
-                text = commentsItems.count.toString(),
-                painter = painterResource(id = R.drawable.ic_share),
-                onItemClickListener = {
-                    onCommentsClickListener(commentsItems)
-                }
-            )
             val sharesItems = statistics.getItemByType(StatisticType.SHARES)
             TwoElement(
                 text = sharesItems.count.toString(),
-                painter = painterResource(id = R.drawable.ic_comment),
+                painter = painterResource(id = R.drawable.ic_share),
                 onItemClickListener = {
                     onSharesClickListener(sharesItems)
                 }
             )
+            val commentsItems = statistics.getItemByType(StatisticType.COMMENTS)
+            TwoElement(
+                text = commentsItems.count.toString(),
+                painter = painterResource(id = R.drawable.ic_comment),
+                onItemClickListener = {
+                    onCommentsClickListener(commentsItems)
+                }
+            )
+
             val likesItems = statistics.getItemByType(StatisticType.LIKES)
             TwoElement(
                 text = likesItems.count.toString(),
